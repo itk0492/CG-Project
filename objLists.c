@@ -131,7 +131,7 @@ void sortVList(vertexes* vList, int vListSize){
     return;
 }
 
-// El criterio para el orden es de menor a mayor dado el punto X
+// El criterio para el orden es de menor a mayor dado el punto X, Y y Z
 void mergeSort(vertexes *vList, int size1, int size2) {
     vertexes temp[size1+size2];
     int ptr1=0, ptr2=0;
