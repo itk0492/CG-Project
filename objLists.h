@@ -28,7 +28,7 @@ int vListCreator(vertexes** vList, char* fileName, int* size);
 int fListCreator(faces** fList, char* fileName, int vListSize, vertexes* vList, int* size);
 int vListProjCreator(vertexesProj** vListProj, int vListSize);
 
-int addPoint(vertexes** vList, vertexes point, int* size);
+int addPoints(vertexes **vList, vertexes *vListAux, int *size, int auxSize);
 int addFace(faces** fList, vertexes* aux, vertexes* vList, int vListSize, int* size);
 
 int searchPoint(vertexes* vList, vertexes point, int size);

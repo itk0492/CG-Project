@@ -39,6 +39,6 @@ int main(int argc, char** argv) {
     for (int i = 0; i < vListSize; ++i) {
         printf("%lf\t%lf\t%lf\n", vList[i].x, vList[i].y, vList[i].z);
     }
-     */
+    */
     return 0;
 }

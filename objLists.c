@@ -10,19 +10,25 @@
 int vListCreator(vertexes** vList, char* fileName, int* size) {
     FILE * f;
     *vList = NULL;
-    vertexes aux[3];
+    vertexes* vListAux=NULL;
+    vertexes aux;
+    int auxSize=0;
     if(!(f=fopen(fileName, "r"))){
         printf("Error while opening file.\n");
         return -1;
     }
     while(!feof(f)){
-        fscanf(f, "%lf %lf %lf %lf %lf %lf %lf %lf %lf\n", &aux[0].x, &aux[0].y, &aux[0].z, &aux[1].x, &aux[1].y, &aux[1].z, &aux[2].x, &aux[2].y, &aux[2].z);
-        addPoint(vList, aux[0], size);
-        addPoint(vList, aux[1], size);
-        addPoint(vList, aux[2], size);
-        sortVList(*vList, *size);
+        fscanf(f, "%lf %lf %lf", &aux.x, &aux.y, &aux.z);
+        ++auxSize;
+        vListAux=realloc(vListAux, (auxSize+1)* sizeof(vertexes));
+        vListAux[auxSize-1].x=aux.x;
+        vListAux[auxSize-1].y=aux.y;
+        vListAux[auxSize-1].z=aux.z;
     }
     fclose(f);
+    sortVList(vListAux, auxSize);
+    addPoints(vList, vListAux, size, auxSize);
+    printf("\nauxSize: %d\nsize: %d\n", auxSize, *size);
     return 0;
 }
 
@@ -52,26 +58,22 @@ int vListProjCreator(vertexesProj** vListProj, int vListSize){
 }
 
 // Esta función se encarga de agregar puntos a la lista de vértices
-int addPoint(vertexes** vList, vertexes point, int* size) {
-    vertexes* vListAux;
-    if((*size)==0){
-        ++(*size);
-        vListAux=realloc(*vList, ((*size)+1)* sizeof(vertexes));
-        *vList=vListAux;
-        vList[0][(*size)-1].x=point.x;
-        vList[0][(*size)-1].y=point.y;
-        vList[0][(*size)-1].z=point.z;
-        return 2; //Retorna 2 que significa que se inicializó la lista
-    } else if(searchPoint(*vList, point, (*size)) == -1){
-        ++(*size);
-        vListAux=realloc(*vList, ((*size)+1)* sizeof(vertexes));
-        *vList=vListAux;
-        vList[0][(*size)-1].x=point.x;
-        vList[0][(*size)-1].y=point.y;
-        vList[0][(*size)-1].z=point.z;
-        return 1; //Retorna 1 que significa que el punto se agregó
+int addPoints(vertexes **vList, vertexes *vListAux, int *size, int auxSize) {
+    ++(*size);
+    *vList=realloc(*vList, ((*size)+1)* sizeof(vertexes));
+    vList[0][(*size)-1].x=vListAux[0].x;
+    vList[0][(*size)-1].y=vListAux[0].y;
+    vList[0][(*size)-1].z=vListAux[0].z;
+    for (int i = 1; i < auxSize; ++i) {
+        if(!(vList[0][(*size)-1].x==vListAux[i].x && vList[0][(*size)-1].y==vListAux[i].y && vList[0][(*size)-1].z==vListAux[i].z)){
+            ++(*size);
+            *vList=realloc(*vList, ((*size)+1)* sizeof(vertexes));
+            vList[0][(*size)-1].x=vListAux[i].x;
+            vList[0][(*size)-1].y=vListAux[i].y;
+            vList[0][(*size)-1].z=vListAux[i].z;
+        }
     }
-    return 0; //Retorna 0 que significa que el punto no fue agregado
+    return 0;
 }
 
 // Esta función se encarga de agregar los vertices correspondientes a la cara
@@ -133,7 +135,8 @@ void sortVList(vertexes* vList, int vListSize){
 
 // El criterio para el orden es de menor a mayor dado el punto X, Y y Z
 void mergeSort(vertexes *vList, int size1, int size2) {
-    vertexes temp[size1+size2];
+    vertexes* temp=NULL;
+    temp=(vertexes*)malloc((size1+size2)*sizeof(vertexes));
     int ptr1=0, ptr2=0;
 
     while (ptr1+ptr2 < size1+size2) {
